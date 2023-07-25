@@ -2,23 +2,34 @@ import { Container } from './App.styled';
 import ContactForm from 'components/ContactForm/ContactForm';
 import Filter from 'components/Filter/Filter';
 import ContactsList from 'components/ContactsList/ContactsList';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectContacts } from 'redux/selectors';
+import { useEffect } from 'react';
+import { fetchContacts } from 'redux/operations';
 
 const App = () => {
-  const contacts = useSelector(state => state.contacts.contacts);
+  const dispatch = useDispatch();
+  const { contactsArr, isLoading, error } = useSelector(selectContacts);
+
+  useEffect(() => {
+    dispatch(fetchContacts());
+  }, [dispatch]);
+
   return (
     <Container>
       <h1>PhoneBook</h1>
       <ContactForm />
 
       <div>
-        {contacts.length > 0 && (
+        {isLoading && !error && <b>Loading...</b>}
+        {error && <p>Oops, something went wrong</p>}
+        {contactsArr.length > 0 && (
           <div>
             <h2>Contacts</h2>
             <Filter />
           </div>
         )}
-        {contacts.length > 0 && <ContactsList />}
+        {contactsArr.length > 0 && <ContactsList />}
       </div>
     </Container>
   );

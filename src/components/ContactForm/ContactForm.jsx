@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import {} from './ContactForm.styled';
 import { useSelector, useDispatch } from 'react-redux';
-import { addContact } from 'redux/contactsSlice';
+import { addContact } from 'redux/operations';
 import Notiflix from 'notiflix';
+import { selectContactsList } from 'redux/selectors';
 
-const ContactForm = ({ onSubmit }) => {
+const ContactForm = () => {
   const [name, setName] = useState('');
-  const [number, setNumber] = useState('');
+  const [phone, setPhone] = useState('');
   const dispatch = useDispatch();
-  const contacts = useSelector(state => state.contacts.contacts);
+  const contacts = useSelector(selectContactsList);
 
   const handleInputChange = e => {
     const { name, value } = e.currentTarget;
@@ -18,7 +19,7 @@ const ContactForm = ({ onSubmit }) => {
         break;
 
       case 'number':
-        setNumber(value);
+        setPhone(value);
         break;
 
       default:
@@ -29,29 +30,32 @@ const ContactForm = ({ onSubmit }) => {
   const handleSubmit = e => {
     e.preventDefault();
 
-    for (const contact of contacts) {
-      if (
-        contact.name.toLowerCase() ===
-        e.target.elements.name.value.toLowerCase()
-      ) {
-        Notiflix.Notify.failure(`${[name]} is already exist`);
-        return;
-      } else if (contact.number === e.target.elements.number.value) {
-        return Notiflix.Notify.failure(
-          `${e.target.elements.number.value} is already exist`
-        );
-      }
+    if (
+      contacts.some(
+        contact =>
+          contact.name.toLowerCase() ===
+          e.target.elements.name.value.toLowerCase()
+      )
+    ) {
+      Notiflix.Notify.failure(`Name ${[name]} is already exist`);
+      return;
+    } else if (
+      contacts.some(contact => contact.phone === e.target.elements.number.value)
+    ) {
+      Notiflix.Notify.failure(
+        `Number ${e.target.elements.number.value} is already exist`
+      );
+      return;
     }
-
     dispatch(
       addContact({
         name: e.target.elements.name.value,
-        number: e.target.elements.number.value,
+        phone: e.target.elements.number.value,
       })
     );
     Notiflix.Notify.success('Contact added');
     setName('');
-    setNumber('');
+    setPhone('');
   };
 
   return (
@@ -79,7 +83,7 @@ const ContactForm = ({ onSubmit }) => {
           required
           placeholder="Enter phone number"
           onChange={handleInputChange}
-          value={number}
+          value={phone}
         />
       </label>
 

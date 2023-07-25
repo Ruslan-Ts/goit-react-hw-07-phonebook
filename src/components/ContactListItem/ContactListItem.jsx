@@ -1,30 +1,22 @@
 import {} from './ContactListItem.styled';
-import { deleteContact } from 'redux/contactsSlice';
+import { deleteContact } from 'redux/operations';
 import { useSelector, useDispatch } from 'react-redux';
 import Notiflix from 'notiflix';
+import { selectVisibleContacts } from 'redux/selectors';
 
-const ContactListItem = ({ name, number, onDeleteContact }) => {
+const ContactListItem = () => {
   const dispatch = useDispatch();
-
-  const contactsState = useSelector(state => state.contacts.contacts);
-  const filterState = useSelector(state => state.filter);
-
-  function getVisibleContacts() {
-    const normalizedFilter = filterState.toLowerCase();
-    return contactsState.filter(contact =>
-      contact.name.toLowerCase().includes(normalizedFilter)
-    );
-  }
+  const visibleContacts = useSelector(selectVisibleContacts);
 
   const handleDelete = (id, name) => {
     dispatch(deleteContact(id));
     Notiflix.Notify.success(`Contact ${name} deleted successfully`);
   };
 
-  return getVisibleContacts().map(({ id, name, number }) => {
+  return visibleContacts.map(({ id, name, phone }) => {
     return (
       <li key={id}>
-        {name}: {number}
+        {name}: {phone}
         <button type="button" onClick={() => handleDelete(id, name)}>
           Delete
         </button>
