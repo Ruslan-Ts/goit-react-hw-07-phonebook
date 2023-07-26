@@ -49,8 +49,8 @@ const ContactForm = () => {
     }
     dispatch(
       addContact({
-        name: e.target.elements.name.value,
-        phone: e.target.elements.number.value,
+        name: name,
+        phone: phone,
       })
     );
     Notiflix.Notify.success('Contact added');
